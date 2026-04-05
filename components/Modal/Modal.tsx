@@ -1,20 +1,26 @@
 "use client";
-import { useRef, ReactNode, useEffect, useCallback } from "react";
-import type { MouseEvent } from "react";
+import { ReactNode, useEffect, useCallback, use } from "react";
 import { useRouter } from "next/navigation";
 import { createPortal } from "react-dom";
+
 import css from "./Modal.module.css";
 
 interface ModalProps {
   children: ReactNode;
-  onClose: () => void;
 }
 
-function Modal({ children, onClose }: ModalProps) {
-  const onCloseRef = useRef(onClose);
+function Modal({ children }: ModalProps) {
   const router = useRouter();
 
   const close = useCallback(() => router.back(), [router]);
+
+  useEffect(() => {
+    const original = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = original;
+    };
+  }, []);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -23,28 +29,6 @@ function Modal({ children, onClose }: ModalProps) {
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, [close]);
-
-  useEffect(() => {
-    onCloseRef.current = onClose;
-  });
-
-  useEffect(() => {
-    const originalOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onCloseRef.current();
-    };
-    window.addEventListener("keydown", handleEsc);
-    return () => {
-      window.removeEventListener("keydown", handleEsc);
-      document.body.style.overflow = originalOverflow;
-    };
-  }, []);
-
-  const handleBackdrop = (e: MouseEvent<HTMLDivElement>) => {
-    if (e.target === e.currentTarget) onCloseRef.current();
-  };
 
   if (typeof document === "undefined") return null;
 
