@@ -1,6 +1,7 @@
 import axios from "axios";
 import type { AxiosResponse } from "axios";
 import type { Note } from "../types/note";
+import type { Category } from "../types/category";
 
 interface FetchNotesParams {
   page?: number;
@@ -103,11 +104,35 @@ async function fetchNoteById(params: FetchNoteByIdParams): Promise<Note> {
   return response.data;
 }
 
+async function getNote(tag: string): Promise<FetchNotesResponse> {
+  const token = process.env.NEXT_PUBLIC_NOTEHUB_TOKEN;
+  const response = await axios.get<FetchNotesResponse>(
+    `${NOTEHUB_BASE_URL}/notes`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: { tag },
+    },
+  );
+  return response.data;
+}
+
+export async function fetchNotesTag(tag?: string): Promise<Note[]> {
+  const params = tag ? { tag } : {};
+  const { data } = await axios.get<Note[]>(`${NOTEHUB_BASE_URL}/notes`, {
+    params,
+  });
+  return data;
+}
+
 const noteService = {
+  getNote,
   fetchNotes,
   createNote,
   deleteNote,
   fetchNoteById,
+  fetchNotesTag,
 };
 
 export default noteService;
