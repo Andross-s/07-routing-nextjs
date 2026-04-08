@@ -5,11 +5,13 @@ interface FetchNotesParams {
   page?: number;
   perPage?: number;
   search?: string;
+  tag?: string;
 }
 
 interface FetchNotesResponse {
   notes: Note[];
   totalPages: number;
+  total: number;
 }
 
 const api = axios.create({
@@ -22,11 +24,13 @@ const api = axios.create({
 async function fetchNotes({
   page = 1,
   perPage = 12,
-  search = "",
-}: FetchNotesParams = {}): Promise<FetchNotesResponse> {
-  const params: Record<string, unknown> = { page, perPage };
 
-  if (search) params.search = search;
+  tag,
+}: FetchNotesParams = {}): Promise<FetchNotesResponse> {
+  const params: Record<string, unknown> = { tag, page, perPage };
+
+  if (tag) params.tag = tag;
+
   const { data } = await api.get<FetchNotesResponse>("/notes", { params });
   // Повертаємо totalPages, total, notes
   return data;

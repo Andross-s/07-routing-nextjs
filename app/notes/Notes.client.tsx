@@ -41,11 +41,11 @@ const NotesClient = () => {
         </button>
         <SearchBox onChange={debouncedSetSearch} />
       </header>
-      {isModalOpen && (
+      {/* {isModalOpen && (
         <Modal onClose={() => setIsModalOpen(false)}>
           <NoteForm onCancel={() => setIsModalOpen(false)} />
         </Modal>
-      )}
+      )} */}
       {isLoading && <div>Loading...</div>}
       {error && <div>Error loading notes</div>}
       {Array.isArray(data?.notes) && data.notes.length > 0 && (
@@ -57,7 +57,7 @@ const NotesClient = () => {
               onPageChange={setPage}
             />
           )}
-          <NoteList notes={data.notes} />
+          {/* <NoteList notes={data.notes} /> */}
         </>
       )}
     </div>
