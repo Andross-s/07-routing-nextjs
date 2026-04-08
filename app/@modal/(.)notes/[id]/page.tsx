@@ -8,7 +8,6 @@ interface Props {
 
 export default async function NoteModalPage({ params }: Props) {
   const { id } = await params;
-  console.log("Resolved id:", id);
 
   const res = await noteService.fetchNoteById(id);
 
