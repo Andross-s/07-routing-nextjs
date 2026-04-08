@@ -35,6 +35,8 @@ function Modal({ children }: ModalProps) {
   const modalRoot = document.getElementById("modal-root");
   if (!modalRoot) return null;
 
+  console.log("MODAL RENDERED");
+
   return createPortal(
     <div
       className={css.backdrop}

@@ -6,6 +6,7 @@ interface Props {
 }
 
 export default function NotePreview({ note }: Props) {
+  console.log("NOTE PREVIEW RENDERED");
   return (
     <div className={css.preview}>
       <h2 className={css.title}>{note.title}</h2>
