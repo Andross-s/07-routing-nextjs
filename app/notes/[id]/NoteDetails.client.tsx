@@ -1,43 +1,37 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 
-import css from "./NoteDetails.module.css";
 import noteService from "@/lib/api";
+import Modal from "@/components/Modal/Modal";
+import NotePreview from "@/components/NotePreview/NotePreview";
 
-type NoteDetailsClientProps = {
+interface NoteDetailsClientProps {
   id: string;
-};
+}
 
-const NoteDetailsClient = ({ id }: NoteDetailsClientProps) => {
-  const { data, isLoading, error } = useQuery({
+function NoteDetailsClient({ id }: NoteDetailsClientProps) {
+  const router = useRouter();
+
+  const {
+    data: note,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["note", id],
     queryFn: () => noteService.fetchNoteById(id),
     refetchOnMount: false,
   });
 
-  if (isLoading) return <p>Loading, please wait...</p>;
-  if (error) {
-    return (
-      <p role="alert">
-        {error instanceof Error ? error.message : "Something went wrong."}
-      </p>
-    );
-  }
-  if (!data) return <p>Something went wrong.</p>;
+  if (isLoading) return null;
+  if (error || !note) return null;
 
   return (
-    <div className={css.container}>
-      <div className={css.item}>
-        <div className={css.header}>
-          <h2>{data?.title}</h2>
-        </div>
-        <p className={css.tag}>{data?.tag}</p>
-        <p className={css.content}>{data?.content}</p>
-        <p className={css.date}>{data?.createdAt}</p>
-      </div>
-    </div>
+    <Modal onClose={() => router.back()}>
+      <NotePreview note={note} />
+    </Modal>
   );
-};
+}
 
 export default NoteDetailsClient;

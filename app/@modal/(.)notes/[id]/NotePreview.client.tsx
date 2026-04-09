@@ -1,17 +1,34 @@
-import { Note } from "@/types/note";
-import css from "./NotePreview.module.css";
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
+import noteService from "@/lib/api";
+import Modal from "@/components/Modal/Modal";
+import NotePreview from "@/components/NotePreview/NotePreview";
 
 interface Props {
-  note: Note;
+  noteId: string;
 }
 
-export default function NotePreview({ note }: Props) {
-  console.log("NOTE PREVIEW RENDERED");
+export default function NotePreviewClient({ noteId }: Props) {
+  const router = useRouter();
+
+  const {
+    data: note,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["note", noteId],
+    queryFn: () => noteService.fetchNoteById(noteId),
+    refetchOnMount: false,
+  });
+
+  if (isLoading) return <p>Loading...</p>;
+  if (isError || !note) return <p>Something went wrong.</p>;
+
   return (
-    <div className={css.preview}>
-      <h2 className={css.title}>{note.title}</h2>
-      {note.tag && <span className={css.tag}>{note.tag}</span>}
-      <p className={css.content}>{note.content}</p>
-    </div>
+    <Modal onClose={() => router.back()}>
+      <NotePreview note={note} />
+    </Modal>
   );
 }

@@ -1,56 +1,30 @@
 "use client";
-import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import type { Note } from "@/types/note";
 import noteService from "@/lib/api";
-import Pagination from "@/components/Pagination/Pagination";
 
 import css from "./NoteList.module.css";
 import Link from "next/link";
 
 interface NoteListProps {
-  tag?: string;
+  notes: Note[];
 }
 
-function NoteList({ tag }: NoteListProps) {
+function NoteList({ notes }: NoteListProps) {
   const queryClient = useQueryClient();
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const page = Number(searchParams.get("page") || 1);
-
-  // Отримання нотаток з урахуванням тегу та сторінки
-  const { data, isLoading } = useQuery({
-    queryKey: ["notes", tag, page],
-    queryFn: () => noteService.fetchNotes({ tag, page }),
-  });
-
-  const notes: Note[] = data?.notes || [];
-
-  const totalPages = data?.totalPages || 1;
 
   // Видалення нотатки
   const mutation = useMutation({
     mutationFn: noteService.deleteNote,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notes", tag, page] });
+      queryClient.invalidateQueries({ queryKey: ["notes"] });
     },
   });
 
   const handleDelete = (id: string) => {
     mutation.mutate(id);
   };
-
-  // Зміна сторінки
-  const handlePageChange = (nextPage: number) => {
-    const params = new URLSearchParams(searchParams);
-    params.set("page", nextPage.toString());
-    router.push(`?${params.toString()}`);
-  };
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
 
   return (
     <>
@@ -75,13 +49,6 @@ function NoteList({ tag }: NoteListProps) {
           </li>
         ))}
       </ul>
-      {totalPages > 1 && (
-        <Pagination
-          totalPages={totalPages}
-          currentPage={page}
-          onPageChange={handlePageChange}
-        />
-      )}
     </>
   );
 }

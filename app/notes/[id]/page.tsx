@@ -8,9 +8,9 @@ import noteService from "@/lib/api";
 
 import NoteDetailsClient from "./NoteDetails.client";
 
-type NoteDetailsPageProps = {
+interface NoteDetailsPageProps {
   params: Promise<{ id: string }>;
-};
+}
 
 export default async function NoteDetailsPage({
   params,

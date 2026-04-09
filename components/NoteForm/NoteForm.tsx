@@ -17,16 +17,16 @@ const validationSchema = yup.object({
 });
 
 interface NoteFormProps {
-  onCancel: () => void;
+  onClose: () => void;
 }
 
-const NoteForm = ({ onCancel }: NoteFormProps) => {
+const NoteForm = ({ onClose }: NoteFormProps) => {
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: noteService.createNote,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notes"] });
-      onCancel();
+      onClose();
     },
   });
 
@@ -82,7 +82,7 @@ const NoteForm = ({ onCancel }: NoteFormProps) => {
             <button
               type="button"
               className={css.cancelButton}
-              onClick={onCancel}
+              onClick={onClose}
             >
               Cancel
             </button>

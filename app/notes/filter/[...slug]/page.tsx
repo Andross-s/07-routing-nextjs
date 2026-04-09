@@ -1,20 +1,36 @@
-import NoteList from "@/components/NoteList/NoteList";
-import { redirect } from "next/navigation";
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from "@tanstack/react-query";
 
-interface Props {
-  params: Promise<{ slug?: string[] }>;
+import noteService from "@/lib/api";
+import NotesClient from "./Notes.client";
+
+interface FilterPageProps {
+  params: Promise<{ slug: string[] }>;
 }
 
-export default async function FilterPage({ params }: Props) {
-  const resolvedParams = await params;
-  if (!resolvedParams.slug || resolvedParams.slug.length === 0) {
-    redirect("/notes/filter/all");
-  }
-  const slug = resolvedParams.slug[0];
+export const dynamic = "force-dynamic";
+
+export default async function FilterPage({ params }: FilterPageProps) {
+  const { slug } = await params;
+
+  const tagValue = slug?.[0];
+  const activeTag = !tagValue || tagValue === "all" ? undefined : tagValue;
+
+  const queryClient = new QueryClient();
+
+  await queryClient.prefetchQuery({
+    queryKey: ["notes", 1, "", activeTag],
+    queryFn: () => noteService.fetchNotes(1, "", activeTag),
+  });
+
+  const dehydratedState = dehydrate(queryClient);
 
   return (
-    <div>
-      <NoteList tag={slug === "all" ? undefined : slug} />
-    </div>
+    <HydrationBoundary state={dehydratedState}>
+      <NotesClient activeTag={activeTag} />
+    </HydrationBoundary>
   );
 }
