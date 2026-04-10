@@ -4,6 +4,7 @@ import * as yup from "yup";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import noteService from "@/lib/api";
+import type { TAGS } from "@/types/note";
 
 import css from "./NoteForm.module.css";
 
@@ -35,11 +36,14 @@ const NoteForm = ({ onClose }: NoteFormProps) => {
       initialValues={{ title: "", content: "", tag: "Todo" }}
       validationSchema={validationSchema}
       onSubmit={(values, actions) => {
-        mutation.mutate(values, {
-          onSettled: () => {
-            actions.setSubmitting(false);
+        mutation.mutate(
+          { ...values, tag: values.tag as TAGS },
+          {
+            onSettled: () => {
+              actions.setSubmitting(false);
+            },
           },
-        });
+        );
       }}
     >
       {({ isSubmitting }) => (

@@ -12,6 +12,7 @@ import Modal from "@/components/Modal/Modal";
 import NoteForm from "@/components/NoteForm/NoteForm";
 import Pagination from "@/components/Pagination/Pagination";
 import NoteList from "@/components/NoteList/NoteList";
+import { TAGS } from "@/types/note";
 
 interface NotesClientProps {
   activeTag?: string;
@@ -29,7 +30,12 @@ function NotesClient({ activeTag }: NotesClientProps) {
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["notes", page, search, activeTag],
-    queryFn: () => noteService.fetchNotes(page, search, activeTag),
+    queryFn: () =>
+      noteService.fetchNotes(
+        page,
+        search,
+        activeTag && activeTag !== "all" ? (activeTag as TAGS) : undefined,
+      ),
     staleTime: 500,
     placeholderData: (prev) => prev,
   });

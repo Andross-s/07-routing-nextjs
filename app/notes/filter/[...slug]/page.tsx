@@ -6,6 +6,7 @@ import {
 
 import noteService from "@/lib/api";
 import NotesClient from "./Notes.client";
+import { TAGS } from "@/types/note";
 
 interface FilterPageProps {
   params: Promise<{ slug: string[] }>;
@@ -23,7 +24,12 @@ export default async function FilterPage({ params }: FilterPageProps) {
 
   await queryClient.prefetchQuery({
     queryKey: ["notes", 1, "", activeTag],
-    queryFn: () => noteService.fetchNotes(1, "", activeTag),
+    queryFn: () =>
+      noteService.fetchNotes(
+        1,
+        "",
+        activeTag && activeTag !== "all" ? (activeTag as TAGS) : undefined,
+      ),
   });
 
   const dehydratedState = dehydrate(queryClient);
