@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { Note } from "../types/note";
+import type { Note, TAGS } from "../types/note";
 
 interface FetchNotesResponse {
   notes: Note[];
@@ -16,8 +16,7 @@ const api = axios.create({
 async function fetchNotes(
   page = 1,
   search?: string,
-
-  tag?: string,
+  tag?: TAGS,
 ): Promise<FetchNotesResponse> {
   const { data } = await api.get<FetchNotesResponse>("/notes", {
     params: {
@@ -34,7 +33,7 @@ async function fetchNotes(
 interface CreateNoteParams {
   title: string;
   content: string;
-  tag: string;
+  tag: TAGS;
 }
 
 async function createNote(note: CreateNoteParams): Promise<Note> {
@@ -53,18 +52,11 @@ async function fetchNoteById(id: string): Promise<Note> {
   return data;
 }
 
-export async function fetchNotesTag(tag?: string): Promise<Note[]> {
-  const params = tag && tag !== "all" ? { tag } : {};
-  const { data } = await api.get<FetchNotesResponse>("/notes", { params });
-  return data.notes;
-}
-
 const noteService = {
   fetchNotes,
   createNote,
   deleteNote,
   fetchNoteById,
-  fetchNotesTag,
 };
 
 export default noteService;
